@@ -13,10 +13,20 @@ class EventsProcessor
 		@events_before_publish = 0
 
 		@urgent = false
+
+		@events_processed = 0
 	end
 
 	def queue
 		@queue
+	end
+
+	def videos
+		@videos
+	end
+
+	def events_processed
+		@events_processed
 	end
 
 	def process!
@@ -37,14 +47,14 @@ class EventsProcessor
 			_message = JSON.parse message
 		rescue JSON::JSONError
 		else
+			@events_processed += 1
+
 			guid = _message['guid']
 			if @videos.has_key? guid
 				@videos[guid][:viewes] += 1
 			else
-				@videos[guid] = { viewes: 1, publish_required: 1 }
+				@videos[guid] = { viewes: 1 }
 			end
-
-			@videos[guid][:publish_required] = true
 
 			if @videos[guid][:viewes] < 100
 				urgent! @videos[guid][:viewes]
@@ -74,7 +84,7 @@ class EventsProcessor
 				result = true
 			end
 
-			if ((DateTime.now - @last_urgent_call) * 24 * 60 * 60).to_i >= 2
+			if ((DateTime.now - @last_urgent_call) * 24 * 60 * 60).to_i >= 1
 				result = true
 			end
 		end
