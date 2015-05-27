@@ -1,0 +1,7 @@
+Simple events processor requires NSQ to be available at 127.0.0.1:4150.
+It waits for events in 'play-events' queue.
+
+To minimize the number of publishes counters for videos with less than 100 views updated within 1 second or after 3-10 messages processed.
+
+To install neccesary gems just run bundle install.
+Processor could be started using ./processor.rb command.
