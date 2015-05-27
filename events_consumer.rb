@@ -5,10 +5,15 @@ class EventsConsumer
 	def initialize queue
 		@queue = queue
 
-		@consumer = Nsq::Consumer.new(
-  			topic: 'play-events',
-  			channel: 'consumer',
-			)
+		begin
+			@consumer = Nsq::Consumer.new(
+	  			topic: 'play-events',
+	  			channel: 'consumer',
+				)
+		rescue Exception => ex
+			puts ex
+			exit
+		end
 
 		@thread = Thread.new {
 			receive_loop
