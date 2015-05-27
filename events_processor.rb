@@ -47,17 +47,19 @@ class EventsProcessor
 			_message = JSON.parse message
 		rescue JSON::JSONError
 		else
-			@events_processed += 1
+			if _message.has_key? 'video_id'
+				@events_processed += 1
 
-			guid = _message['guid']
-			if @videos.has_key? guid
-				@videos[guid][:viewes] += 1
-			else
-				@videos[guid] = { viewes: 1 }
-			end
+				guid = _message['video_id']
+				if @videos.has_key? guid
+					@videos[guid][:viewes] += 1
+				else
+					@videos[guid] = { viewes: 1 }
+				end
 
-			if @videos[guid][:viewes] < 100
-				urgent! @videos[guid][:viewes]
+				if @videos[guid][:viewes] < 100
+					urgent! @videos[guid][:viewes]
+				end
 			end
 		end
 	end

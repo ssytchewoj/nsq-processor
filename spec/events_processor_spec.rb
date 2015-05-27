@@ -32,9 +32,9 @@ describe EventsProcessor do
 			}.not_to raise_error
 		end
 
-		it "should incerease processed message count after each message processing" do
+		it "should incerease processed messages count after each message processing" do
 			2.times do
-				@queue << { guid: 'test' }.to_json
+				@queue << { video_id: 'test' }.to_json
 
 				expect {
 					@processor.process! 
@@ -42,10 +42,18 @@ describe EventsProcessor do
 			end
 		end
 
+		it "shouldn't increase processed messages count if json doesn't have video_id attributes" do
+			@queue << { asdfasf: 'test' }.to_json
+
+			expect {
+				@processor.process!
+			}.not_to change(@processor, :events_processed)
+		end
+
 		it "should add GUID to videos hash" do
 			expect(@processor.videos).not_to include('test')
 
-			@queue << { guid: 'test' }.to_json
+			@queue << { video_id: 'test' }.to_json
 			@processor.process!
 
 			expect(@processor.videos).to include('test')
@@ -62,7 +70,7 @@ describe EventsProcessor do
 			end
 
 			it "should output views counter for videos with less than 100 views ASAP" do
-				@queue << { guid: 'test' }.to_json
+				@queue << { video_id: 'test' }.to_json
 				@processor.process!
 
 				sleep 1
@@ -74,7 +82,7 @@ describe EventsProcessor do
 
 			it "shouldn't output views counter for videos with more than 100 views ASAP" do
 				105.times do
-					@queue << { guid: 'test' }.to_json
+					@queue << { video_id: 'test' }.to_json
 					@processor.process!
 				end
 				
